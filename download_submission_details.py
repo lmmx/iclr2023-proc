@@ -42,3 +42,9 @@ if not json_path.exists():
 tsv_path = Path("submissions.tsv")
 if not tsv_path.exists():
     tsv_path.write_text(df.to_csv(sep="\t", index=False))
+
+tsv_no_abs_path = Path("submissions_no_abstract.tsv")
+if not tsv_no_abs_path.exists():
+    tsv_no_abs_path.write_text(
+        df.drop(columns=["abstract"]).to_csv(sep="\t", index=False)
+    )
