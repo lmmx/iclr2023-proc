@@ -44,7 +44,6 @@ if not tsv_path.exists():
     tsv_path.write_text(df.to_csv(sep="\t", index=False))
 
 tsv_no_abs_path = Path("submissions_no_abstract.tsv")
+abs_cols = ["abstract", "TL;DR", "area", "keywords", "paperhash"]
 if not tsv_no_abs_path.exists():
-    tsv_no_abs_path.write_text(
-        df.drop(columns=["abstract"]).to_csv(sep="\t", index=False)
-    )
+    tsv_no_abs_path.write_text(df.drop(columns=abs_cols).to_csv(sep="\t", index=False))
