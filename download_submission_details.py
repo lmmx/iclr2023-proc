@@ -9,8 +9,9 @@ guest_client = openreview.Client(baseurl="https://api.openreview.net")
 invitation_ref = "ICLR.cc/2023/Conference/-/Blind_Submission"
 
 notes = guest_client.get_all_notes(invitation=invitation_ref)
-note_fields = "id original number".split()
-content_fields = "title keywords TL;DR abstract Please_choose_the_closest_area_that_your_submission_falls_into paperhash pdf".split()
+note_fields = "id number".split()
+content_fields = "title keywords TL;DR abstract area paperhash pdf".split()
+area_alias = "Please_choose_the_closest_area_that_your_submission_falls_into"
 
 
 def unpack_record(note) -> dict:
@@ -18,7 +19,11 @@ def unpack_record(note) -> dict:
         field: value for field, value in vars(note).items() if field in note_fields
     }
     for field in content_fields:
-        record.update({field: note.content.get(field)})
+        accessed_field = area_alias if field == "area" else field
+        content_value = note.content.get(accessed_field)
+        if field == "abstract" and content_value is not None:
+            content_value = content_value.replace("\n", "\\n")
+        record.update({field: content_value})
     return record
 
 
@@ -35,5 +40,5 @@ if not json_path.exists():
     json_path.write_text(df.to_json())
 
 tsv_path = Path("submissions.tsv")
-if not csv_path.exists():
-    tsv_path.write_text(df.to_csv(sep="\t"))
+if not tsv_path.exists():
+    tsv_path.write_text(df.to_csv(sep="\t", index=False))
